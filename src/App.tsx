@@ -3,7 +3,24 @@ import './App.css';
 
 import logo from './logo.svg';
 
+import {
+  app,
+  trace,
+} from './lib'
+
 class App extends React.Component {
+
+  public state = {
+    cats: []
+  }
+
+  public componentDidMount() {
+    app('cats').then((cats) => {
+      trace('didMount', cats)
+      this.setState({cats})
+    })
+  }
+
   public render() {
     return (
       <div className="App">
@@ -11,9 +28,7 @@ class App extends React.Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
+        { this.state.cats.map((x: string, i: number) => <img key={i} src={x}/>) }
       </div>
     );
   }
