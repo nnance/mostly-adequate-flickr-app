@@ -1,13 +1,12 @@
 import {
     compose,
+    composeP,
     curry,
     map,
     prop,
 } from "ramda"
 
-import Axios, {
-    AxiosResponse,
-} from "axios"
+import Axios from "axios"
 
 
 export const trace = curry((tag: string, x: any) => {
@@ -17,17 +16,15 @@ export const trace = curry((tag: string, x: any) => {
 });
 
 const getUrl = (term: string) =>
-    `/services/feeds/photos_public.gne?tags=${term}&format=json&jsoncallback=?`;
+    Promise.resolve(`/services/feeds/photos_public.gne?tags=${term}&format=json&jsoncallback=?`);
 
 const mediaUrl = compose(prop('m'), prop('media'));
 
-const srcs = compose(map(mediaUrl), prop('items'));
+export const srcs = compose(map(mediaUrl), prop('items'));
 
-const getJSON = (url: string) =>
-    Axios.get(url).then((resp: AxiosResponse) => {
-        const removeParams = (resp.data as string).substr(1).substr(0, resp.data.length - 2)
-        const result = srcs(JSON.parse(removeParams));
-        return result
-    });
+const trimFirstLast = (val: string) => val.substr(1).substr(0, val.length - 2);
 
-export const app = compose(getJSON, getUrl);
+const parseResult = compose(JSON.parse, trimFirstLast, prop('data'))
+
+export const getJSON = composeP(parseResult, Axios.get, getUrl);
+

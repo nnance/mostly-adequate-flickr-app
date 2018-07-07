@@ -4,21 +4,19 @@ import './App.css';
 import logo from './logo.svg';
 
 import {
-  app,
-  trace,
+  getJSON, srcs,
 } from './lib'
 
 class App extends React.Component {
 
   public state = {
-    cats: []
+    images: []
   }
 
   public componentDidMount() {
-    app('cats').then((cats) => {
-      trace('didMount', cats)
-      this.setState({cats})
-    })
+    getJSON('puppies').then(
+      (data) => this.setState({images: srcs(data)})
+    );
   }
 
   public render() {
@@ -28,7 +26,7 @@ class App extends React.Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        { this.state.cats.map((x: string, i: number) => <img key={i} src={x}/>) }
+        { this.state.images.map((x: string, i: number) => <img key={i} src={x}/>) }
       </div>
     );
   }
